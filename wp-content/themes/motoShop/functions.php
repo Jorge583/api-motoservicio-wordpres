@@ -12,7 +12,7 @@ function moto_shop_setup() {
 
 function moto_shop_api_init() {
        register_rest_field(
-           array ('page', 'post'),
+           array ('page', 'post', 'product'),
            'featured_images', 
             array( 'get_callback' => 'get_featured_image'),      
        );
@@ -20,6 +20,11 @@ function moto_shop_api_init() {
            array ('post'),
            'category_datails', 
             array( 'get_callback' => 'get_post_categories'),      
+       );
+       register_rest_field(
+           array ('page'),
+           'gallery', 
+            array( 'get_callback' => 'get_gallery_images'),      
        );
 }
 add_action('rest_api_init', 'moto_shop_api_init');
@@ -47,10 +52,39 @@ function get_post_categories( $post ) {
         function($category_id) {
                 $cat = get_category($category_id, ARRAY_A);
                 return [
+                    'id' => $cat['term_id'],
                     'name' => $cat['name'],
                     'slug' => $cat['slug'],
                 ];
             },
             $post['categories']
+    );
+}
+function get_gallery_images( $post) {
+    if($post['slug'] !== 'galeria') {
+        return [];
+    }
+    $gallery = get_post_gallery($post['id'], false);
+    $gallery_ids = array_map('intval', explode(',', $gallery['ids']));
+
+      return array_map(
+        function($image_id) {
+            $large_image = wp_get_attachment_image_src($image_id, 'large');
+            $full_image = wp_get_attachment_image_src($image_id, 'full');
+
+            return [
+                'large' => [
+                    'url' => $large_image[0],
+                    'width' => $large_image[1],
+                    'height' => $large_image[2],
+                ],
+                'full' => [
+                    'url' => $full_image[0],
+                    'width' => $full_image[1],
+                    'height' => $full_image[2],
+                ],
+            ];
+        },
+        $gallery_ids
     );
 }
