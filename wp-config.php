@@ -21,22 +21,22 @@
 
 // ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'local' );
+define( 'DB_NAME', getenv( 'DB_NAME' ) ?: '' );
 
 /** Database username */
-define( 'DB_USER', 'root' );
+define( 'DB_USER', getenv( 'DB_USER' ) ?: '' );
 
 /** Database password */
-define( 'DB_PASSWORD', 'root' );
+define( 'DB_PASSWORD', getenv( 'DB_PASSWORD' ) ?: '' );
 
 /** Database hostname */
-define( 'DB_HOST', 'localhost' );
+define( 'DB_HOST', getenv( 'DB_HOST' ) ?: '' );
 
 /** Database charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8' );
 
 /** The database collate type. Don't change this if in doubt. */
-define( 'DB_COLLATE', '' );
+define( 'DB_COLLATE', getenv( 'DB_COLLATE' ) ?: '' );
 
 /**#@+
  * Authentication unique keys and salts.
@@ -49,15 +49,15 @@ define( 'DB_COLLATE', '' );
  *
  * @since 2.6.0
  */
-define( 'AUTH_KEY',          'es,bUg;?_!a $c7jjxE9fo[?wWcMHF}sO-g$nZ^}s <cJ?63i+Ag|/_PS6/:<`gn' );
-define( 'SECURE_AUTH_KEY',   '|oDc].9EK+Ht`=2whcdy{hm>4$gsc.xQ(5{!74DI%3vWc+2Sa0Gdn=-rx2>Fl`IM' );
-define( 'LOGGED_IN_KEY',     ';|]SCOmN]e-ga n=ha68+Ls5j4l@<CV/LM2,GhDQsvsViYy!Sn=PRQD*>yyW6|sz' );
-define( 'NONCE_KEY',         '}.yR<$9])`MK9 ,*0t!N[,tCM1;%ORAGhn~<QpR7P1uXjlVeZ|Mf!Js+Rsg]i/ks' );
-define( 'AUTH_SALT',         '$ :lfb1q3z;0{?.dr[HjGF+6i.=gQmFS#oG=MtdlL5g#R_Oi/i6Bb9g{3yf(_ms}' );
-define( 'SECURE_AUTH_SALT',  '!CjKI:k<L:dbI,d;=,+t(i^#.,TP;w;# H$1Sy_Y]&N|Eb9Vc&pw*;PzQ>1q$~G%' );
-define( 'LOGGED_IN_SALT',    'eVR1K/S}NUu!{;-[Mn+Bb9XA>/2V^S1m(&#:f|xCx>O#3(W5P@G]_Gycl~Hx!8`f' );
-define( 'NONCE_SALT',        '[tP$j*~?C1]p1O@+RpcZnf(de`}pFJ5Nsp52_>QLpKPETT O:04rD1P YFiIz;[$' );
-define( 'WP_CACHE_KEY_SALT', ';XWw8%3|TuKRGF[]PaA}TCvm8isfI7%!>!QQ+!4ctO^bJsp(h*}HoC3I7+!?+k=J' );
+define( 'AUTH_KEY',          getenv( 'AUTH_KEY' ) ?: 'replace-in-environment' );
+define( 'SECURE_AUTH_KEY',   getenv( 'SECURE_AUTH_KEY' ) ?: 'replace-in-environment' );
+define( 'LOGGED_IN_KEY',     getenv( 'LOGGED_IN_KEY' ) ?: 'replace-in-environment' );
+define( 'NONCE_KEY',         getenv( 'NONCE_KEY' ) ?: 'replace-in-environment' );
+define( 'AUTH_SALT',         getenv( 'AUTH_SALT' ) ?: 'replace-in-environment' );
+define( 'SECURE_AUTH_SALT',  getenv( 'SECURE_AUTH_SALT' ) ?: 'replace-in-environment' );
+define( 'LOGGED_IN_SALT',    getenv( 'LOGGED_IN_SALT' ) ?: 'replace-in-environment' );
+define( 'NONCE_SALT',        getenv( 'NONCE_SALT' ) ?: 'replace-in-environment' );
+define( 'WP_CACHE_KEY_SALT', getenv( 'WP_CACHE_KEY_SALT' ) ?: 'replace-in-environment' );
 
 
 /**#@-*/
@@ -72,6 +72,22 @@ $table_prefix = 'wp_';
 
 
 /* Add any custom values between this line and the "stop editing" line. */
+
+if ( ! defined( 'WP_ENVIRONMENT_TYPE' ) ) {
+	define( 'WP_ENVIRONMENT_TYPE', getenv( 'WP_ENVIRONMENT_TYPE' ) ?: 'local' );
+}
+
+$frontend_origin = getenv( 'FRONTEND_URL' );
+if ( $frontend_origin && filter_var( $frontend_origin, FILTER_VALIDATE_URL ) ) {
+	header( 'Access-Control-Allow-Origin: ' . $frontend_origin );
+	header( 'Vary: Origin' );
+	header( 'Access-Control-Allow-Methods: GET, POST, OPTIONS' );
+	header( 'Access-Control-Allow-Headers: Content-Type, Authorization' );
+}
+if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'OPTIONS' === $_SERVER['REQUEST_METHOD'] ) {
+	http_response_code( 204 );
+	exit;
+}
 
 
 
@@ -91,7 +107,6 @@ if ( ! defined( 'WP_DEBUG' ) ) {
 	define( 'WP_DEBUG', false );
 }
 
-define( 'WP_ENVIRONMENT_TYPE', 'local' );
 /* That's all, stop editing! Happy publishing. */
 
 /** Absolute path to the WordPress directory. */

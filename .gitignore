@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+
+wp-content/uploads/
+wp-content/cache/
+wp-content/ai1wm-backups/
+wp-content/upgrade/
+wp-content/backup-*/
+
+*.log
+*.sql
+*.zip
+.DS_Store
+Thumbs.db

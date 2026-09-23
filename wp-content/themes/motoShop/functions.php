@@ -30,9 +30,9 @@ function moto_shop_api_init() {
 add_action('rest_api_init', 'moto_shop_api_init');
 
 function get_featured_image( $post, ) {
-       if(!$post['featured_media']) {
-       return false;
-    }
+       if ( empty( $post['featured_media'] ) ) {
+           return false;
+       }
        $image_sizes = get_intermediate_image_sizes();
         $images = array();
        foreach($image_sizes as $size) {
@@ -48,6 +48,9 @@ function get_featured_image( $post, ) {
         return $images;
 }
 function get_post_categories( $post ) {
+    if ( empty( $post['categories'] ) || ! is_array( $post['categories'] ) ) {
+        return array();
+    }
     return array_map(
         function($category_id) {
                 $cat = get_category($category_id, ARRAY_A);
